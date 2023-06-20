@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+*{
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+  background-color: transparent;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.anticon-check svg {
+  color: #f37f13;
+}
+.ant-select-item-option-active {
+  background-color: rgba(138, 170, 250, 0.15) !important;
+}
+.ant-select-item-option-content{
+ display: flex;
+ align-items: center;
+}
+
+.custom-option-select {
+  background: #f3f3f3;
+  border-radius: 4px;
+  padding: 4px 8px;
+  display: inline-block;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: #131317;
+}
+
+.Toastify__toast--error {
+  height: 48px;
+  border-radius: 8px !important;
+  background: #d0302f !important;
+}
+.Toastify__toast--error::after {
+  /*content : url('../assets/images/svg/closeToast.svg');*/
+  position: absolute;
+  color: #333333;
+  font-size: 15px;
+  font-weight: 700;
+  left: 265px;
+  padding-top: 14px !important;
+}
+.Toastify__toast--error::before {
+  content: url('assets/icons/icon_error.svg') !important;
+  position: relative;
+  z-index: 100000;
+  left: 12px;
+  top: 15px;
+}
+.Toastify__progress-bar-theme--colored.Toastify__progress-bar--error {
+  height: 48px;
+}
+
+.Toastify__toast--success {
+  height: 48px;
+  border-radius: 8px !important;
+  background: #068e0d !important;
+}
+.Toastify__toast--success::after {
+  /*content : url('../assets/images/svg/closeToast.svg');*/
+  position: absolute;
+  color: #333333;
+  font-size: 15px;
+  font-weight: 700;
+  left: 265px;
+  padding-top: 14px !important;
+}
+.Toastify__toast--success::before {
+  content: url('assets/icons/icon_success.svg') !important;
+  position: relative;
+  z-index: 100000;
+  left: 12px;
+  top: 15px;
+}
+.Toastify__progress-bar-theme--colored.Toastify__progress-bar--success {
+  height: 48px;
+}
+
+:root {
+  --toastify-toast-min-height: 48px;
+  --toastify-toast-width: auto;
+}

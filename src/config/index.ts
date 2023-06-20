@@ -1,0 +1,31 @@
+export const WIDTH_RESIZE = 350;
+export const HEIGHT_RESIZE = 350;
+
+export const STYLE_LIST = [
+  "anime",
+  "chibi",
+  "chinese_art",
+  "concept",
+  "disney",
+  "fairy",
+  "fantasy",
+  "ghibi",
+  "knight",
+  "manga",
+  "manhua",
+  "manhwa",
+  "oil_painting",
+  "league_of_legends",
+  "star_war",
+  "3d_art",
+  "mechanics",
+  "water_color",
+  "stain_glass",
+  "ink_style",
+  "horoscope",
+  "sketch",
+  "barbie_doll",
+  "colorized",
+  "cartoonize",
+  "none",
+];
