@@ -5,6 +5,7 @@ import { styled } from 'styled-components';
 export const PullsWrapper = styled.div`
   // background-color: #f7f7f7;
   flex: 1;
+  width: 100%;
   // padding: 16px;
 
   .ant-tabs {
