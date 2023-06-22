@@ -1,5 +1,5 @@
 import { Button, Input, Pagination, Select, Typography, notification } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { extractOwnerRepo, getCookie } from '../../utils/shared';
 import { checkRepoExits, getListCollaborators, getListPullRequest } from '../../services/services';
 import TableContent from '../TableContent';
@@ -9,6 +9,7 @@ import IconSelectFilter from '../../assets/images/icon-select-filter.svg';
 import IconSearch from '../../assets/images/icon-search.svg';
 import { DrawerWrapper, PullsWrapper, Title, TotalRecordTitle } from './style';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { read, utils, writeFileXLSX } from 'xlsx';
 
 const PullsList = ({dataApi}: any) => {
   const columns = [
@@ -59,7 +60,7 @@ const PullsList = ({dataApi}: any) => {
 
   const [page, setPage] = useState<number>(1);
 
-  const [pageSize, setPageSize] = useState<number>(30);
+  const [pageSize, setPageSize] = useState<number>(100);
 
   const [authors, setAuthors] = useState([]);
 
@@ -88,7 +89,7 @@ const PullsList = ({dataApi}: any) => {
       const params = {
         author,
         page,
-        page_size: pageSize
+        per_page: pageSize
       }
       const res = await getListPullRequest(repo, token, params);
       console.log('res', res);
@@ -149,16 +150,17 @@ const PullsList = ({dataApi}: any) => {
    }
   }
 
-  const handleChangePage = (page: number) => {
-    console.log(page);
-    setPage(page)
-  };
-
+  const handleChangePageSize = (page: number, pageSize: number) => {
+    setPage(page);
+    setPageSize(pageSize);
+  }
   const handleChangeLimit = (limit: number) => {
     console.log(limit);
     setPageSize(limit)
   };
-
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPageData = pulls.slice(startIndex, endIndex);
   const handleChangeFilterAuthor = (au: string) => {
     console.log(au);
     setAuthor(au)
@@ -183,7 +185,21 @@ const PullsList = ({dataApi}: any) => {
     console.log('author', author);
     
   };
-
+  const handleExportXlxs = useCallback(() => {
+    const pullData = pulls.map((item: any, index: number) => {
+      return {
+          no: index +1,
+          owner: item.user.login,
+          status: item.state,
+          link: item?.pull_request?.url,
+          reviewer: item.reviewer,
+        }
+    }) 
+    const ws = utils.json_to_sheet(pullData)
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "Data");
+    writeFileXLSX(wb, "ListPullRequest.xlsx");
+  },[pulls])
   const hanldeResetDrawerFilter = () => {};
 
 
@@ -211,18 +227,23 @@ const clickRow = (record: any, rowIndex: number) => {
               <span>Filter</span>
             </div>
           </div>
+          <div>
+              <Button className="btn-export" onClick={handleExportXlxs}>
+                  Export
+              </Button>
+            </div>
         </div>
         {/* <TotalRecordTitle style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 'bold'}}>Tổng số Pulls Request: {totalRecord}</TotalRecordTitle> */}
-        <TableContent columns={columns} dataSource={pulls} height="55vh" loading={isLoading} clickRowTable={clickRow}/>
+        <TableContent columns={columns} dataSource={currentPageData} height="55vh" loading={isLoading} clickRowTable={clickRow}/>
       </div>
       <Pagination
-        // pageSize={pageSize}
+        current = {page}
+        pageSize={pageSize}
         total={totalRecord}
-        onChange={handleChangePage}
-        onShowSizeChange={handleChangeLimit}
-        // pageSizeOptions={}
-        showSizeChanger={false}
-        
+        onChange={handleChangePageSize}
+        onShowSizeChange={handleChangePageSize}
+        showSizeChanger={true}  
+        pageSizeOptions = {[30,50,100]}
       />
       <DrawerWrapper
         placement="right"

@@ -53,6 +53,7 @@ const ListStyle = () => {
         if (res.data?.id) {
           navigate(`/pulls?repo=${ownerRepo}`)
           setCookie('token', token);
+          sessionStorage.setItem('repo', ownerRepo);
         }
         setIsLoading(false)
       } catch (error: any) {

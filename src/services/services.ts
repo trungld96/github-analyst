@@ -12,9 +12,13 @@ export const getListPullRequest = async (repos: string, token: string, params: a
 };
 
 export const getListCommitRequest = async (id: number, repos: string, token: string, params: any) => {
-  const res = await axiosInstance.get(`/repos/${repos}/pulls/${id}/commits`, { params, headers: {
+  let url = `/repos/${repos}/commits`;
+  const res = await axiosInstance.get(url, {
+    params, headers: {
     Authorization: `token ${token}`
-  }});
+    }
+  });
+  console.log('params', params)
   return res;
 };
 

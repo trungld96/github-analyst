@@ -1,3 +1,4 @@
+import { TablePaginationConfig } from 'antd';
 import { TableContentWrapper } from './style';
 
 interface IPropsTableContent {

@@ -22,70 +22,90 @@ export const CommitsWrapper = styled.div`
       padding: 15px 0px;
       flex: 1 1 auto;
       display: flex;
+      justify-content: space-between;
       flex-direction: column;
       width: 100%;
-      .box-search {
+      .header{
         display: flex;
         justify-content: space-between;
-        .search-and-filter {
-          display: flex;
-          gap: 15px;
-          .input-search {
-            padding: 14px;
-            width: 300px;
-            border-radius: 4px;
-            border: 1px solid #eaeaea;
-            input {
-              font-weight: 400;
-              font-size: 16px;
-              line-height: 22px;
-              margin-left: 8px;
-              &::placeholder {
-                color: #8c8c92;
-                font-weight: 400;
-                font-size: 16px;
-                line-height: 22px;
-              }
-            }
-          }
-          .filter {
-            cursor: pointer;
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 13px;
-            border: 1px solid #eaeaea;
-            border-radius: 4px;
-            font-weight: 400;
-            font-size: 14px;
-            line-height: 20px;
-            color: #8c8c92;
-          }
-        }
-        .add-ai {
-          cursor: pointer;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+        .btn-export {
+          width: 119px;
+          height: 54px; 
           background: #f37f13;
           border-radius: 8px;
-          padding: 13px 24px;
           font-weight: 600;
           font-size: 16px;
           line-height: 22px;
-          color: white;
-          gap: 18px;
-          .plus {
-            width: 20px;
-            height: 20px;
-            background-color: white;
+          color: #ffffff;
+          border: none;
+          &:hover {
+            color: #ffffff;
+          }
+        }
+        .box-search {
+          display: flex;
+          justify-content: space-between;
+          .search-and-filter {
+            display: flex;
+            gap: 15px;
+            .input-search {
+              padding: 14px;
+              width: 300px;
+              border-radius: 4px;
+              border: 1px solid #eaeaea;
+              input {
+                font-weight: 400;
+                font-size: 16px;
+                line-height: 22px;
+                margin-left: 8px;
+                &::placeholder {
+                  color: #8c8c92;
+                  font-weight: 400;
+                  font-size: 16px;
+                  line-height: 22px;
+                }
+              }
+            }
+            .filter {
+              cursor: pointer;
+              padding: 15px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 13px;
+              border: 1px solid #eaeaea;
+              border-radius: 4px;
+              font-weight: 400;
+              font-size: 14px;
+              line-height: 20px;
+              color: #8c8c92;
+            }
+          }
+          
+          .add-ai {
+            cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #f37f13;
-            border-radius: 50%;
-            font-size: 18px;
+            background: #f37f13;
+            border-radius: 8px;
+            padding: 13px 24px;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 22px;
+            color: white;
+            gap: 18px;
+            .plus {
+              width: 20px;
+              height: 20px;
+              background-color: white;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              color: #f37f13;
+              border-radius: 50%;
+              font-size: 18px;
+            }
           }
         }
       }

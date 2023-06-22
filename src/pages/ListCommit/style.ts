@@ -2,18 +2,22 @@ import { Button, Drawer, Form, Input, Modal } from 'antd';
 import { Link } from 'react-router-dom';
 import { styled } from 'styled-components';
 
-export const PullsWrapper = styled.div`
-  // background-color: #f7f7f7;
-  flex: 1 1;
-  width: 100%;
-  // padding: 16px;
-
+export const ListCommitWrapper = styled.div`
+  background-color: #f7f7f7;
+  flex: 1;
+  padding: 24px;
   .ant-tabs {
     width: 100%;
   }
-  .ant-pagination {
-    text-align: center;
-  }
+  .content {
+    height: 100%;
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // justify-content: center;
     .title {
       font-weight: 600;
       font-size: 20px;
@@ -29,7 +33,7 @@ export const PullsWrapper = styled.div`
       width: 100%;
       .box-search {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         .search-and-filter {
           display: flex;
           gap: 15px;
@@ -66,22 +70,6 @@ export const PullsWrapper = styled.div`
             color: #8c8c92;
           }
         }
-        .btn-export {
-          width: 119px;
-          height: 54px;
-          justify-content: center;
-          align-items: center;
-          background: #f37f13;
-          border-radius: 8px;
-          font-weight: 600;
-          font-size: 16px;
-          line-height: 22px;
-          color: #ffffff;
-          border: none;
-          &:hover {
-            color: #ffffff;
-          }
-        }
         .add-ai {
           cursor: pointer;
           display: flex;
@@ -108,6 +96,7 @@ export const PullsWrapper = styled.div`
           }
         }
       }
+    }
   }
 `;
 
@@ -159,7 +148,6 @@ export const DrawerWrapper = styled(Drawer)`
       cursor: pointer;
     }
   }
-  
   .btn-cancel {
     width: 119px;
     height: 54px;
@@ -201,9 +189,9 @@ export const LoginForm = styled(Form)`
 
 export const Title = styled('p')`
   font-weight: 700;
-  font-size: 24px;
-  line-height: 26px;
-  margin-bottom: 1rem;
+  font-size: 28px;
+  line-height: 42px;
+  text-align: center;
 `;
 
 export const Note = styled('p')`
@@ -278,9 +266,4 @@ outline: none;
   border-color: #ffa13d;
 }
 }
-`
-export const TotalRecordTitle = styled('div')`
-  margin-top: '1rem';
-  font-size: '1rem';
-  font-weight: 'bold';
 `

@@ -3,12 +3,16 @@ import { styled } from "styled-components";
 export const SidebarWrapper = styled.div`
     width: 270px;
     height: 100%;
+    flex: 1 1 auto;
     background: #09173B;
     color: white;
     font-weight: 600;
     font-size: 16px;
     line-height: 22px;
     padding: 0px 15px;
+    .menu{
+        width: 100%;
+    }
     .logo{
         text-align: center;
         margin-top: 9px;
@@ -21,6 +25,7 @@ export const SidebarWrapper = styled.div`
         padding: 16px;
         margin-bottom: 10px;
         cursor: pointer;
+        font-size: 16px;
     }
     .active-menu{
         background: #1C2A50;

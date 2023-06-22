@@ -12,7 +12,7 @@ import ListStyle from './pages/ListStyle';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import ListCommit from './pages/CommitPage';
 import ListPull from './pages/ListPull';
-
+import ListCommits from './pages/ListCommit';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 const queryClient = new QueryClient({
@@ -33,6 +33,7 @@ root.render(
           <Route path="/" element={<DefaultLayout />}>
             <Route index element={<ListStyle />} />
             <Route path='/pulls' element={<ListPull />} />
+            <Route path='/commits' element={<ListCommits/>}/>
             <Route path="/pulls/:id" element={<ListCommit />} />
             {/* <Route element={<ListProject />} path="projects" />
             <Route element={<DetailProject />} path="project/:id" /> */}
