@@ -77,12 +77,12 @@ const PullsList = ({dataApi}: any) => {
   const [api, contextHolder]: any = notification.useNotification();
 
   useEffect(() => {
-    getListPulls();
+    getListPulls(page, pageSize);
     getListAuthor();
-  }, [])
+  }, [page, pageSize])
 
 
-  const getListPulls = async () => {
+  const getListPulls = async (page: number, pageSize: number) => {
     const token: any = getCookie('token');
     setIsLoading(true)
     try {
@@ -153,14 +153,12 @@ const PullsList = ({dataApi}: any) => {
   const handleChangePageSize = (page: number, pageSize: number) => {
     setPage(page);
     setPageSize(pageSize);
+    getListPulls(page, pageSize);
   }
   const handleChangeLimit = (limit: number) => {
     console.log(limit);
     setPageSize(limit)
   };
-  const startIndex = (page - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentPageData = pulls.slice(startIndex, endIndex);
   const handleChangeFilterAuthor = (au: string) => {
     console.log(au);
     setAuthor(au)
@@ -234,7 +232,7 @@ const clickRow = (record: any, rowIndex: number) => {
             </div>
         </div>
         {/* <TotalRecordTitle style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 'bold'}}>Tổng số Pulls Request: {totalRecord}</TotalRecordTitle> */}
-        <TableContent columns={columns} dataSource={currentPageData} height="55vh" loading={isLoading} clickRowTable={clickRow}/>
+        <TableContent columns={columns} dataSource={pulls} height="55vh" loading={isLoading} clickRowTable={clickRow}/>
       </div>
       <Pagination
         current = {page}
