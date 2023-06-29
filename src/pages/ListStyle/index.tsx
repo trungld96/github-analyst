@@ -1,18 +1,19 @@
 import { Button, Divider, Select, Tabs, notification } from 'antd';
 import { useEffect, useState } from 'react';
-import { ButtonSubmit, Container, DrawerWrapper, FormItem, InputCustom, Label, ListStyleWrapper, LoginForm, Note, Title } from './style';
+import { GithubOutlined } from '@ant-design/icons';
+import { ButtonGithub, ButtonSubmit, Container, DrawerWrapper, FormItem, InputCustom, Label, ListStyleWrapper, LoginForm, Note, Title } from './style';
 import IconSelectFilter from '../../assets/images/icon-select-filter.svg';
 import IconCloseFilter from '../../assets/images/icon-close-filter.svg';
 import ModalConfirmDelete from '../../components/ModalConfirmDelete';
 import ModalCreateStyle from '../../components/ModalCreateStyle/index';
 import { extractOwnerRepo, setCookie } from '../../utils/shared';
-
+import { getGitHubUrl } from '../../utils/getGithubUrl';
 import TabPane from 'antd/es/tabs/TabPane';
 import PullsList from '../../components/PullsList';
 import CommitsList from '../../components/CommitsList';
-import { checkRepoExits, getListPullRequest } from '../../services/services';
-import { useNavigate } from 'react-router-dom';
-
+import { checkRepoExits, getListPullRequest, getAccessToken } from '../../services/services';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 const ListStyle = () => {
 
   const [openFilter, setOpenFilter] = useState(false);
@@ -31,8 +32,9 @@ const ListStyle = () => {
   
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-
+  const from = ((location.state as any)?.from.pathname as string) || "/profile";
   const [api, contextHolder]: any = notification.useNotification();
 
   useEffect(() => {
@@ -66,12 +68,11 @@ const ListStyle = () => {
         });
       }
     }
-};
-
-
-console.log('dataApi', dataApi);
-
-
+  };
+  const handleLogin = async () => {
+    const url = process.env.REACT_APP_BASE_BE_URL;
+    window.location.href = `${url}/github`;
+  }
   return (
     <ListStyleWrapper>
       {contextHolder}
@@ -149,7 +150,14 @@ console.log('dataApi', dataApi);
                         Terms & Privacy Policy
                     </TermLink>
                 </TermAndPrivacy> */}
-            </LoginForm>
+          </LoginForm>
+                <Divider>
+                    <Note>or</Note>
+                </Divider>
+          <ButtonGithub onClick={handleLogin}>
+            <GithubOutlined />
+            Continue with GitHub
+          </ButtonGithub>
         </Container>}
       </div>
     </ListStyleWrapper>

@@ -2,7 +2,7 @@ import { Button, Drawer, Form, Input, Modal } from 'antd';
 import { Link } from 'react-router-dom';
 import { styled } from 'styled-components';
 
-export const ListStyleWrapper = styled.div`
+export const CommitPageWrapper = styled.div`
   background-color: #f7f7f7;
   flex: 1;
   padding: 24px;
@@ -16,7 +16,7 @@ export const ListStyleWrapper = styled.div`
     padding: 24px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    // align-items: center;
     // justify-content: center;
     .title {
       font-weight: 600;
@@ -253,16 +253,6 @@ export const ButtonSubmit = styled(Button)`
   justify-content: center;
   width: 100%;
 `
-export const ButtonGithub = styled(Button)`
-  align-item: center;
-  background: #1f1f1f;
-  color: white;
-  border-radius: 12px;
-  cursor: pointer;
-  height: 3.5em;
-  justify-content: center;
-  width: 100%;
-`
 export const InputCustom = styled(Input)`
 border: 1px solid #f0f0f0;
 border-radius: 8px;
@@ -276,4 +266,8 @@ outline: none;
   border-color: #ffa13d;
 }
 }
+`
+
+export const DescriptionWrapper = styled('div')`
+  margin: 2rem 1rem;
 `

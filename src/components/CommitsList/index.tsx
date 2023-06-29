@@ -6,7 +6,7 @@ import { CommitsWrapper, TotalRecordTitle } from './style';
 import TableContent from '../../components/TableContent';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { utils, writeFileXLSX } from 'xlsx';
-
+import  dayjs from 'dayjs';
 const CommitsList = ({ dataApi }: any) => {
   const columns = [
     {
@@ -31,6 +31,12 @@ const CommitsList = ({ dataApi }: any) => {
         return <a target='_blank' href={value} rel="noreferrer">{value}</a>;
       },
     },
+    {
+      title: 'DATE',
+      dataIndex: 'date',
+      key: 'date',
+      width: 120,
+    }
   ];
   const navigate = useNavigate();
 
@@ -47,15 +53,19 @@ const CommitsList = ({ dataApi }: any) => {
   const [author, setAuthor] = useState();
 
   const { id }: any = useParams();
+  console.log('id commitlist', id);
   const [searchParams] = useSearchParams();
-  const repo: any = searchParams.get('repo')
-  console.log('id', id);
-  
+  let repo: any = searchParams.get('repo');
+  let accessToken = searchParams.get('access_token');
+  if (!accessToken) accessToken = getCookie('access_token');
+  console.log(accessToken);
+  const repo1 = getCookie('repo');
   const [api, contextHolder]: any = notification.useNotification();
 
   useEffect(() => {
-    if (repo) {
+    if (repo1) {
       getListCommits();
+      console.log(1);
       // getListAuthor();
     }
   }, [repo])
@@ -63,10 +73,13 @@ const CommitsList = ({ dataApi }: any) => {
 
   const getListCommits = async () => {
     //const { ownerRepo, token } = dataApi;
-    const token: any = getCookie('token');
+    let token: any = getCookie('token');
+    if (!token) token = accessToken;
+    if (!repo) repo = repo1;
     setIsLoading(true)
     try {
       const params = {
+        page,
         per_page: pageSize
       }
       const res = await getListCommitRequest(id, repo, token, params);
@@ -77,6 +90,7 @@ const CommitsList = ({ dataApi }: any) => {
             ...item,
             owner: item?.author?.login,
             link: item?.commit?.url,
+            date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
           }
         })
         setTotalRecord(commitsMap.length)
@@ -87,7 +101,7 @@ const CommitsList = ({ dataApi }: any) => {
      console.log('err', error);
      setIsLoading(false)
      if (error?.response?.status === 401) {
-      navigate('/');
+      //navigate('/');
       api['error']({
         message: 'Error',
         description:
@@ -114,6 +128,7 @@ const CommitsList = ({ dataApi }: any) => {
           no: index +1,
           owner: item?.author?.login,
           link: item?.commit?.url,
+          date: item?.commit.committer.date,
         }
     })
     const ws = utils.json_to_sheet(commitsData);

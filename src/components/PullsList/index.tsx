@@ -1,6 +1,6 @@
 import { Button, Input, Pagination, Select, Typography, notification } from 'antd';
 import { useEffect, useState, useCallback } from 'react';
-import { extractOwnerRepo, getCookie } from '../../utils/shared';
+import { extractOwnerRepo, getCookie, setCookie } from '../../utils/shared';
 import { checkRepoExits, getListCollaborators, getListPullRequest } from '../../services/services';
 import TableContent from '../TableContent';
 import IconFilter from '../../assets/images/icon-filter.svg';
@@ -10,8 +10,8 @@ import IconSearch from '../../assets/images/icon-search.svg';
 import { DrawerWrapper, PullsWrapper, Title, TotalRecordTitle } from './style';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { read, utils, writeFileXLSX } from 'xlsx';
-
-const PullsList = ({dataApi}: any) => {
+import dayjs from 'dayjs';
+const PullsList = ({ dataApi, data }: any) => {
   const columns = [
     {
       title: 'NO',
@@ -30,7 +30,7 @@ const PullsList = ({dataApi}: any) => {
       title: 'STATUS',
       dataIndex: 'state',
       key: 'state',
-      width: 180,
+      width: 110,
     },
     {
       title: 'LINK',
@@ -46,6 +46,12 @@ const PullsList = ({dataApi}: any) => {
       dataIndex: 'reviewer',
       key: 'reviewer',
     },
+    {
+      title: 'DATE',
+      dataIndex: 'date',
+      key: 'date',
+      width: 120,
+    }
   ];
 
   const [openFilter, setOpenFilter] = useState(false);
@@ -71,19 +77,23 @@ const PullsList = ({dataApi}: any) => {
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  const repo: any = searchParams.get('repo')
-
+  const [repo, setRepo] = useState<string | null>(searchParams.get('repo')|| getCookie('repo') || data[0].value)
+  //let repo: any = searchParams.get('repo')
+  const accessToken = searchParams.get('access_token');
 
   const [api, contextHolder]: any = notification.useNotification();
 
   useEffect(() => {
-    getListPulls(page, pageSize);
+    if(repo) getListPulls(page, pageSize);
     getListAuthor();
-  }, [page, pageSize])
+  }, [page, pageSize, repo])
 
 
   const getListPulls = async (page: number, pageSize: number) => {
-    const token: any = getCookie('token');
+    let token: any = getCookie('token');
+    setCookie('repo', repo);
+    if (!token) token = accessToken;
+    console.log('token', token);
     setIsLoading(true)
     try {
       const params = {
@@ -99,7 +109,7 @@ const PullsList = ({dataApi}: any) => {
             ...item,
             owner: item.user.login,
             link: item?.pull_request?.url,
-
+            date: dayjs(item?.created_at).format('DD/MM/YYYY'),
           }
         })
         setTotalRecord(res.data.total_count)
@@ -110,7 +120,7 @@ const PullsList = ({dataApi}: any) => {
      console.log('err', error);
      setIsLoading(false)
      if (error?.response?.status === 401) {
-      navigate('/');
+      //navigate('/');
       api['error']({
         message: 'Error',
         description:
@@ -127,7 +137,9 @@ const PullsList = ({dataApi}: any) => {
   }
 
   const getListAuthor = async () => {
-    const token: any = getCookie('token');
+    let token: any = getCookie('token');
+    if (!token) token = accessToken;
+    console.log('token', token);
     try {
       const res = await getListCollaborators(repo, token, {});
      console.log('res', res);
@@ -135,7 +147,7 @@ const PullsList = ({dataApi}: any) => {
         const authorsMap = res.data.map((item: any) => {
           return {
             label: item.login,
-            value: item.login
+            value: item.login,
           }
         })
         setAuthors(authorsMap)
@@ -191,6 +203,7 @@ const PullsList = ({dataApi}: any) => {
           status: item.state,
           link: item?.pull_request?.url,
           reviewer: item.reviewer,
+          date: dayjs(item?.created_at).format('DD/MM/YYYY')
         }
     }) 
     const ws = utils.json_to_sheet(pullData)
@@ -199,14 +212,18 @@ const PullsList = ({dataApi}: any) => {
     writeFileXLSX(wb, "ListPullRequest.xlsx");
   },[pulls])
   const hanldeResetDrawerFilter = () => {};
-
-
-
-
+  const onChange = async (value: string) => {
+    setRepo(value);
+  };
+  const onSearch = (value: string) => {
+    setRepo(value);
+  };
+  console.log('repo', repo);
 
 const clickRow = (record: any, rowIndex: number) => {
-    console.log(record, rowIndex);
-    navigate(`/pulls/${record.number}?repo=${repo}`)
+  console.log(record, rowIndex);
+  (!accessToken) ? navigate(`/pulls/${record.number}?repo=${repo}`) : 
+     navigate(`/details/${record.number}?repo=${repo}`)
 }
 
   return (
@@ -224,6 +241,19 @@ const clickRow = (record: any, rowIndex: number) => {
               <img src={IconFilter} alt="" />
               <span>Filter</span>
             </div>
+            {accessToken && <div>
+              <Select
+                style={{ width: 250 }}
+                size="middle"
+                showSearch
+                placeholder="Select a repository"
+                optionFilterProp="children"
+                options={data}
+                value={repo}
+                onChange={onChange}
+                onSearch={onSearch}
+              ></Select>
+            </div>}
           </div>
           <div>
               <Button className="btn-export" onClick={handleExportXlxs}>

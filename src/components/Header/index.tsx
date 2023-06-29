@@ -10,7 +10,11 @@ const Header = () => {
   const { pathname } = location;
   const backToAnalyst = () => {
     setCookie('token', '')
+    setCookie('access_token', '')
+    setCookie('user', '')
+    setCookie('repo', '')
     navigate('/')
+    localStorage.setItem('list', 'pull')
   }
   return (
     <HeaderWrapper>

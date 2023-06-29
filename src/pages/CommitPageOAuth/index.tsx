@@ -7,23 +7,25 @@ import CommitsList from '../../components/CommitsList';
 import { getPullRequest } from '../../services/services';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-const CommitPage = () => {
+const CommitPageOAuth = () => {
 
   const [pull, setPull] = useState<any>();
 
 
   const { id }: any = useParams();
-  
+  console.log('id', id);
   const [searchParams] = useSearchParams();
-  const repo: any = searchParams.get('repo')
-
+  let repo: any = searchParams.get('repo')
+  const accessToken = getCookie('access_token');
+  const repo1 = getCookie('repo');
   useEffect(() => {
     getDetailPullRequest()
   }, [])
-
-
   const getDetailPullRequest = async () => {
-    const token: any = getCookie('token')
+    let token: any = getCookie('token')
+    if (!token) token = accessToken;
+    if (!repo) repo = repo1;
+    console.log(repo, token);
     try {
       const res = await getPullRequest(repo, id, token);
       console.log('res', res);
@@ -62,7 +64,6 @@ const CommitPage = () => {
                 {pull?.merged_by?.login}
               </Descriptions.Item>
               <Descriptions.Item label="Link"><a target='_blank' href={pull?.html_url} rel="noreferrer">{pull?.html_url}</a></Descriptions.Item>
-
             </Descriptions>
           </DescriptionWrapper>
           <CommitsList />
@@ -70,4 +71,4 @@ const CommitPage = () => {
     </CommitPageWrapper>
   );
 };
-export default CommitPage;
+export default CommitPageOAuth;

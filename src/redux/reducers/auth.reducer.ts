@@ -1,18 +1,29 @@
-import {createAction, createSlice} from '@reduxjs/toolkit';
+import {PayloadAction, createAction, createSlice} from '@reduxjs/toolkit';
 import tokenAuthService from "../../utils/tokenAuthService";
 import {getProfile, login } from "../thunks/authThunk";
 import {ToastSuccess} from "../../components/toast-message/ToastMessage";
 
 export const logOut = createAction('auth/logout');
 
-const initialState = {
-    userInfo: null as any
+const initialState: AuthState = {
+    userInfo: null as any,
+    isAuthenticated: false,
+    accessToken: null,
 };
+interface AuthState {
+    userInfo: any;
+    isAuthenticated: boolean;
+    accessToken: string | null;
+  }
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
+        setAuthenticated: (state, action: PayloadAction<string>) => {
+            state.isAuthenticated = true;
+            state.accessToken = action.payload;
+        },
         setDataUserInfo(state, action) {
             state.userInfo = action.payload;
         }
@@ -42,5 +53,5 @@ const authSlice = createSlice({
     }
 });
 
-export const { setDataUserInfo } = authSlice.actions;
+export const { setDataUserInfo, setAuthenticated } = authSlice.actions;
 export default authSlice.reducer;

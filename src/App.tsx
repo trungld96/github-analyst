@@ -105,7 +105,7 @@ function App() {
             setIsLoading(false);
             successToast("Fetch styles successfuly!");
         } catch (error: AxiosError | any) {
-            errorToast("Error!");
+            errorToast("Erroraaaaa!");
         }
     };
 
