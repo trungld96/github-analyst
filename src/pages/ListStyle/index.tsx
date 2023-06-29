@@ -71,7 +71,7 @@ const ListStyle = () => {
   };
   const handleLogin = async () => {
     const url = process.env.REACT_APP_BASE_BE_URL;
-    window.location.href = `${url}/github`;
+    window.location.replace(`${url}/github`);
   }
   return (
     <ListStyleWrapper>
