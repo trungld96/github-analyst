@@ -27,6 +27,12 @@ const PullsList = ({ dataApi, data }: any) => {
       width: 120,
     },
     {
+      title: 'TITLE',
+      dataIndex: 'title',
+      key: 'title',
+      width:320,
+    },
+    {
       title: 'STATUS',
       dataIndex: 'state',
       key: 'state',
@@ -108,7 +114,7 @@ const PullsList = ({ dataApi, data }: any) => {
           return {
             ...item,
             owner: item.user.login,
-            link: item?.pull_request?.url,
+            link: item?.pull_request?.html_url,
             date: dayjs(item?.created_at).format('DD/MM/YYYY'),
           }
         })
@@ -200,8 +206,9 @@ const PullsList = ({ dataApi, data }: any) => {
       return {
           no: index +1,
           owner: item.user.login,
+          title: item?.title,
           status: item.state,
-          link: item?.pull_request?.url,
+          link: item?.pull_request?.html_url,
           reviewer: item.reviewer,
           date: dayjs(item?.created_at).format('DD/MM/YYYY')
         }

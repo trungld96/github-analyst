@@ -23,6 +23,12 @@ const CommitsList = ({ dataApi }: any) => {
       width: 120,
     },
     {
+      title: 'TITLE',
+      dataIndex: 'title',
+      key: 'title',
+      width:320,
+    },
+    {
       title: 'LINK',
       dataIndex: 'link',
       key: 'link',
@@ -89,7 +95,8 @@ const CommitsList = ({ dataApi }: any) => {
           return {
             ...item,
             owner: item?.author?.login,
-            link: item?.commit?.url,
+            title: item?.commit?.message,
+            link: item?.html_url,
             date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
           }
         })
@@ -127,7 +134,8 @@ const CommitsList = ({ dataApi }: any) => {
       return {
           no: index +1,
           owner: item?.author?.login,
-          link: item?.commit?.url,
+          title: item?.commit?.message,
+          link: item?.html_url,
           date: item?.commit.committer.date,
         }
     })
