@@ -156,11 +156,11 @@ const CommitsList = ({ dataApi }: any) => {
       }
     } catch (error: any) {
       console.log('err', error);
-      api['error']({
-        message: 'Error',
-        description:
-          'Error',
-      });
+      // api['error']({
+      //   message: 'Error',
+      //   description:
+      //     'Error',
+      // });
     }
    }
 

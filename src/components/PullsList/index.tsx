@@ -154,11 +154,11 @@ const PullsList = ({ dataApi, data }: any) => {
      }
    } catch (error: any) {
      console.log('err', error);
-     api['error']({
+     /*api['error']({
        message: 'Error',
        description:
          'Error',
-     });
+     });*/
    }
   }
 

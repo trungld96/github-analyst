@@ -154,7 +154,7 @@ const UserInfo = () => {
               <Descriptions.Item label="Organization">{orgzs}</Descriptions.Item>
             </Descriptions>
           </DescriptionWrapper>
-        {(list === 'pull') ? <PullsList data={repo}/> : <CommitsList />}
+        {(list === 'commit') ? <CommitsList /> : <PullsList data={repo}/> }
       </div>
     </CommitPageWrapper>
   )
