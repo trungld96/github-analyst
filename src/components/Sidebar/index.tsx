@@ -1,12 +1,13 @@
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { SidebarWrapper } from './style';
+import { SidebarWrapper, MenuItem } from './style';
 import Logo from '../../assets/images/logo.svg';
 import IconRight from '../../assets/images/icon-right.svg';
 import IconDown from '../../assets/images/icon-down.svg';
 import { getCookie } from '../../utils/shared';
 import { ListContext } from '../ListContext';
-import { useContext } from 'react'; 
+import { useContext, useState } from 'react'; 
 const Sidebar = () => {
+  const [activeMenu, setActiveMenu] = useState('pull');
   const { list, updateList } = useContext(ListContext);
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Sidebar = () => {
   const accessToken = getCookie('access_token');
   const user = getCookie('user');
   const clickMenuPull = () => {
+    setActiveMenu('pull');
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     (token) ? navigate(`/pulls?repo=${repo}`) :
       (!paramUser) ? navigate(`/userinfo?user=${user}&access_token=${accessToken}`) : (
@@ -35,19 +37,20 @@ const Sidebar = () => {
       ) : (
       localStorage.setItem('list', 'commit'),
       updateList('commit')
-    )
+      )
+      setActiveMenu('commit');
   }
 
   const { pathname } = location;
   return (
     <SidebarWrapper>
       <div className="menu">
-        <div className="item-menu" onClick={clickMenuPull}>
+        <MenuItem className={activeMenu === 'pull' ? 'active' : ''} onClick={clickMenuPull}>
           List Pull Request
-          </div>
-        <div className="item-menu" onClick={clickMenuCommit}>
+          </MenuItem>
+        <MenuItem className={activeMenu === 'commit' ? 'active' : ''} onClick={clickMenuCommit}>
           List Commit
-        </div>
+        </MenuItem>
       </div>
     </SidebarWrapper>
   );

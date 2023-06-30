@@ -9,7 +9,7 @@ export const SidebarWrapper = styled.div`
     font-weight: 600;
     font-size: 16px;
     line-height: 22px;
-    padding: 0px 15px;
+    padding: 0px;
     .menu{
         width: 100%;
     }
@@ -18,17 +18,18 @@ export const SidebarWrapper = styled.div`
         margin-top: 9px;
         margin-bottom: 65px;
     }
-    .item-menu{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-    .active-menu{
+`
+export const MenuItem = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    &.active {
         background: #1C2A50;
-        border-radius: 8px;
     }
+
 `
