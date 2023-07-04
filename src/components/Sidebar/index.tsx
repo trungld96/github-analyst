@@ -25,7 +25,6 @@ const Sidebar = () => {
         localStorage.setItem('list', 'pull'),
         updateList('pull')
       );
-    console.log('token sidebar', token)
   } 
   const clickMenuCommit = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions

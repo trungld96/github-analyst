@@ -74,7 +74,7 @@ const CommitsList = ({ dataApi }: any) => {
       console.log(1);
       // getListAuthor();
     }
-  }, [repo])
+  }, [repo, page])
 
 
   const getListCommits = async () => {
@@ -126,7 +126,7 @@ const CommitsList = ({ dataApi }: any) => {
   }
   const handleChangePageSize = (page: number, pageSize: number) => {
     setPage(page);
-    setPageSize(pageSize);
+   // setPageSize(pageSize);
   }
 
   const handleExportXlxs = useCallback(() => {
@@ -195,15 +195,15 @@ const CommitsList = ({ dataApi }: any) => {
                   Export
             </Button>
         </div>
-        <TableContent columns={columns} dataSource={currentPageData} height="55vh" loading={isLoading} />
+        <TableContent columns={columns} dataSource={commits} height="55vh" loading={isLoading} />
         <Pagination style={{marginTop: '20px'}}
-        current = {page}
-        pageSize={pageSize}
-        total={totalRecord}
+        defaultCurrent = {page}
+        //pageSize={pageSize}
+        total={5000}
         onChange={handleChangePageSize}
-        onShowSizeChange={handleChangePageSize}
-        showSizeChanger={true}  
-        pageSizeOptions = {[30,50,100]}
+      //  onShowSizeChange={handleChangePageSize}
+      //  showSizeChanger={true}  
+        //pageSizeOptions = {[30,50,100]}
       />
       </div>
       {contextHolder}
