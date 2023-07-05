@@ -21,6 +21,16 @@ export const getListCommitRequest = async (id: number, repos: string | null, tok
   console.log('params', params)
   return res;
 };
+export const getBranchs = async (repos: string | null, token: string, params: any) => {
+  let url = `/repos/${repos}/branches`;
+  const res = await axiosInstance.get(url, {
+    params, headers: {
+    Authorization: `token ${token}`
+    }
+  });
+  console.log('params', params)
+  return res;
+}
 
 export const getProfile = async (username: string | null, token: string) => {
   let url = `/users/${username}`;
@@ -68,7 +78,7 @@ export const getPullRequest = async (repos: string | null, id: number, token: st
     Authorization: `token ${token}`
   }});
   return res;
-};
+};  
 export const getAccessToken = async () => {
   const res = await axiosGit.get(`/github`,
   )

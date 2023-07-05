@@ -1,7 +1,7 @@
-import { Button, Pagination, notification } from 'antd';
+import { Button, Pagination, Select, notification } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { getCookie } from '../../utils/shared';
-import { getListCollaborators, getListCommitRequest } from '../../services/services';
+import { getBranchs, getListCollaborators, getListCommitRequest } from '../../services/services';
 import { CommitsWrapper, TotalRecordTitle } from './style';
 import TableContent from '../../components/TableContent';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -53,11 +53,12 @@ const CommitsList = ({ dataApi }: any) => {
   const [pageSize, setPageSize] = useState<number>(100);
 
   const [commits, setCommits] = useState([]);
+  const [branch, setBranch] = useState([]);
   
   const [totalRecord, setTotalRecord] = useState(0);
 
   const [author, setAuthor] = useState();
-
+  const [sha, setSha] = useState('main');
   const { id }: any = useParams();
   console.log('id commitlist', id);
   const [searchParams] = useSearchParams();
@@ -71,10 +72,10 @@ const CommitsList = ({ dataApi }: any) => {
   useEffect(() => {
     if (repo1) {
       getListCommits();
-      console.log(1);
+      getListBranchs();
       // getListAuthor();
     }
-  }, [repo, page])
+  }, [repo, page, sha])
 
 
   const getListCommits = async () => {
@@ -85,6 +86,7 @@ const CommitsList = ({ dataApi }: any) => {
     setIsLoading(true)
     try {
       const params = {
+        sha: sha,
         page,
         per_page: pageSize
       }
@@ -102,6 +104,49 @@ const CommitsList = ({ dataApi }: any) => {
         })
         setTotalRecord(commitsMap.length)
         setCommits(commitsMap)
+     }
+     setIsLoading(false)
+   } catch (error: any) {
+     console.log('err', error);
+     setIsLoading(false)
+     if (error?.response?.status === 401) {
+      //navigate('/');
+      api['error']({
+        message: 'Error',
+        description:
+          'Error',
+      });
+     } else {
+      api['error']({
+        message: 'Error',
+        description:
+          'Error',
+      });
+     }
+     
+   }
+  }
+  const getListBranchs = async () => {
+    let token: any = getCookie('token');
+    if (!token) token = accessToken;
+    if (!repo) repo = repo1;
+    setIsLoading(true)
+    try {
+      const params = {
+        page,
+        per_page: pageSize
+      }
+      const res = await getBranchs(repo, token, params);
+      console.log('res', res);
+      if (res.status === 200) {
+        const branchMap = res.data.map((item: any) => {
+          return {
+            label: item.name,
+            value: item.name,
+          }
+        })
+        setBranch(branchMap)
+        
      }
      setIsLoading(false)
    } catch (error: any) {
@@ -142,12 +187,12 @@ const CommitsList = ({ dataApi }: any) => {
     const ws = utils.json_to_sheet(commitsData);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "Data");
-    writeFileXLSX(wb, "ListCommits.xlsx");
+    writeFileXLSX(wb, `${repo1}_Commits.xlsx`);
   },[commits])
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const currentPageData = commits.slice(startIndex, endIndex);
-
+  console.log('All branch:', branch)
   const getListAuthor = async () => {
      const { ownerRepo, token } = dataApi;
      try {
@@ -180,16 +225,33 @@ const CommitsList = ({ dataApi }: any) => {
   // const handleAddStyle = () => {
   //   setOpenCreateStyle(true);
   // };
-
+  const onChange = async (value: string) => {
+    setSha(value);
+  };
+  const onSearch = (value: string) => {
+    setSha(value);
+  };
   return (
     <CommitsWrapper>
       <div className="list-style">
         <div className="header">
           <div>
             <div style={{ textAlign: 'left', fontSize: '18px', fontWeight: 'bold' }}>
-              List Commit</div>
+              List Commit: {repo1}</div>
             <TotalRecordTitle style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 'bold' }}>
-                Tổng số Commits: {totalRecord}</TotalRecordTitle>
+              Tổng số Commits: {totalRecord}</TotalRecordTitle>
+              <Select
+                className="select"
+                style={{ width: 250 }}
+                size="middle"
+                showSearch
+                placeholder="Select a branch"
+                optionFilterProp="children"
+                options={branch}
+                value={sha}
+                onChange={onChange}
+                onSearch={onSearch}
+              ></Select>
           </div>
           <Button className="btn-export" onClick={handleExportXlxs}>
                   Export

@@ -1,4 +1,4 @@
-import { Button, Drawer, Form, Input, Modal } from 'antd';
+import { Button, Drawer, Form, Input, Modal,} from 'antd';
 import { Link } from 'react-router-dom';
 import { styled } from 'styled-components';
 
@@ -7,6 +7,12 @@ export const CommitsWrapper = styled.div`
   width: 100%;
   .ant-tabs {
     width: 100%;
+  }
+  .select{
+    display: flex;
+    justify-content: space-between;
+    align-item: center;
+    padding-top: 10px
   }
   .ant-pagination {
     text-align: center;
@@ -232,7 +238,6 @@ export const TermAndPrivacy = styled('p')`
 export const TermLink = styled('a')`
   color: ${(props) => `${props.theme.color.link}`};
 `;
-
 
 
 export const FormItem = styled(Form.Item)`

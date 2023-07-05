@@ -216,7 +216,7 @@ const PullsList = ({ dataApi, data }: any) => {
     const ws = utils.json_to_sheet(pullData)
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "Data");
-    writeFileXLSX(wb, "ListPullRequest.xlsx");
+    writeFileXLSX(wb, `${repo}_PullRequests.xlsx`);
   },[pulls])
   const hanldeResetDrawerFilter = () => {};
   const onChange = async (value: string) => {
