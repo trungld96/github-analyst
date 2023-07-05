@@ -181,7 +181,7 @@ const CommitsList = ({ dataApi }: any) => {
           owner: item?.author?.login,
           title: item?.commit?.message,
           link: item?.html_url,
-          date: item?.commit.committer.date,
+          date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
         }
     })
     const ws = utils.json_to_sheet(commitsData);
