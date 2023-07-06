@@ -359,6 +359,7 @@ console.log(authors)
   const onCloseDrawerFilter = () => {
     setOpenFilter(false);
   };
+  console.log(accessToken)
   return (
     <CommitsWrapper>
       <div className="list-style">
@@ -380,10 +381,12 @@ console.log(authors)
                     <span>Filter</span>
                   </div>
                 </div>
-              </div>
+            </div>
+            <div style={{display: "flex", alignItems: "center", }}>
+            <span>Select a branch</span>
               <Select
                 className="select"
-                style={{ width: 250 }}
+                style={{ width: 200, marginLeft: 15 }}
                 size="middle"
                 showSearch
                 placeholder="Select a branch"
@@ -392,10 +395,11 @@ console.log(authors)
                 value={sha}
                 onChange={onChange}
                 onSearch={onSearch}
-            ></Select>
-            {accessToken && <div>
+              ></Select>
+            </div>
+            {accessToken && <div><span>Select a repository</span>
               <Select
-                style={{ width: 250, marginTop: 20 }}
+                style={{ width: 250, marginTop: 20, marginLeft: 15 }}
                 size="middle"
                 showSearch
                 placeholder="Select a repository"

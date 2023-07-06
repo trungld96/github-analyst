@@ -81,6 +81,8 @@ const PullsList = ({ dataApi, data }: any) => {
 
   const [since, setSince] = useState('');
 
+  const [isLoadingExport, setIsLoadingExport] = useState(true);
+
   const [until, setUntil] = useState('');
 
   const [pulls, setPulls] = useState([]);
@@ -114,6 +116,7 @@ const PullsList = ({ dataApi, data }: any) => {
     const page = pageNext || 1
     let token: any = getCookie('token');
     if (!token) token = accessToken;
+    setIsLoadingExport(true)
     const params: any = {
         author,
         page,
@@ -134,7 +137,10 @@ const PullsList = ({ dataApi, data }: any) => {
       })
       setPrsExport((prevPulls: any) => [...pullsMap, ...prevPulls])
       }
-    if (res.data.items.length === 100) getAll(page + 1);
+    if (res.data.items.length === 100) getAll(page + 1)
+    else {
+      setIsLoadingExport(false);
+    }
   }
   
   console.log('pullExport', prsExport);
@@ -326,11 +332,11 @@ const clickRow = (record: any, rowIndex: number) => {
               ></Select>
             </div>}
           </div>
-          <div>
-              <Button className="btn-export" onClick={handleExportXlxs}>
-                  Export
-              </Button>
-            </div>
+          {!isLoadingExport && <div>
+            <Button className="btn-export" onClick={handleExportXlxs}>
+              Export
+            </Button>
+          </div>}
         </div>
         {/* <TotalRecordTitle style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 'bold'}}>Tổng số Pulls Request: {totalRecord}</TotalRecordTitle> */}
         <TableContent columns={columns} dataSource={pulls} height="55vh" loading={isLoading} clickRowTable={clickRow}/>
