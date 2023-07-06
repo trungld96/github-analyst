@@ -7,7 +7,9 @@ export const getListPullRequest = async (repos: string | null, token: string, pa
   }
   const res = await axiosInstance.get(url, { params, headers: {
     Authorization: `token ${token}`
-  }});
+  }
+  });
+  console.log('params', params)
   return res;
 };
 
@@ -28,7 +30,6 @@ export const getBranchs = async (repos: string | null, token: string, params: an
     Authorization: `token ${token}`
     }
   });
-  console.log('params', params)
   return res;
 }
 

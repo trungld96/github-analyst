@@ -41,6 +41,7 @@ export const CommitsWrapper = styled.div`
           border-radius: 8px;
           font-weight: 600;
           font-size: 16px;
+          margin-top:100px;
           line-height: 22px;
           color: #ffffff;
           border: none;

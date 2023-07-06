@@ -1,13 +1,18 @@
-import { Button, Pagination, Select, notification } from 'antd';
+import { Button, Input, Pagination, Select, notification, DatePicker } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
-import { getCookie } from '../../utils/shared';
+import type { DatePickerProps } from 'antd';
+import { getCookie, setCookie } from '../../utils/shared';
 import { getBranchs, getListCollaborators, getListCommitRequest } from '../../services/services';
-import { CommitsWrapper, TotalRecordTitle } from './style';
+import { CommitsWrapper, DrawerWrapper, TotalRecordTitle } from './style';
 import TableContent from '../../components/TableContent';
+import IconCloseFilter from '../../assets/images/icon-close-filter.svg';
+import IconSelectFilter from '../../assets/images/icon-select-filter.svg';
+import IconSearch from '../../assets/images/icon-search.svg';
+import IconFilter from '../../assets/images/icon-filter.svg';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { utils, writeFileXLSX } from 'xlsx';
 import  dayjs from 'dayjs';
-const CommitsList = ({ dataApi }: any) => {
+const CommitsList = ({ dataApi, data }: any) => {
   const columns = [
     {
       title: 'NO',
@@ -31,7 +36,7 @@ const CommitsList = ({ dataApi }: any) => {
     {
       title: 'LINK',
       dataIndex: 'link',
-      key: 'link',
+      key: 'link',  
       width: 500,
       render: (value: any) => {
         return <a target='_blank' href={value} rel="noreferrer">{value}</a>;
@@ -50,86 +55,179 @@ const CommitsList = ({ dataApi }: any) => {
 
   const [page, setPage] = useState<number>(1);
 
+  const [openFilter, setOpenFilter] = useState(false);
+
   const [pageSize, setPageSize] = useState<number>(100);
 
+  const [isLoadingExport, setIsLoadingExport] = useState(true);
+
   const [commits, setCommits] = useState([]);
+
   const [branch, setBranch] = useState([]);
-  
+
+  const [count, setCount] = useState([]);
+
+  const [commitsExport, setCommitsExport] = useState<any>([]);
+
   const [totalRecord, setTotalRecord] = useState(0);
 
-  const [author, setAuthor] = useState();
-  const [sha, setSha] = useState('main');
-  const { id }: any = useParams();
-  console.log('id commitlist', id);
+  const [author, setAuthor] = useState('');
+
+  const [since, setSince] = useState('');
+
+  const [until, setUntil] = useState('');
+
   const [searchParams] = useSearchParams();
-  let repo: any = searchParams.get('repo');
+
+  const [apply, setApply] = useState(true)
+
+  const [repo, setRepo] =  useState<string | null>(searchParams.get('repo')|| getCookie('repo') || data[0].value)
+
+  const [authors, setAuthors] = useState();
+
+  const [commit, setCommit] = useState([]);
+
+  const [sha, setSha] = useState('main');
+  
+  const { id }: any = useParams();
+
+  console.log('id commitlist', id);
   let accessToken = searchParams.get('access_token');
   if (!accessToken) accessToken = getCookie('access_token');
   console.log(accessToken);
+
   const repo1 = getCookie('repo');
   const [api, contextHolder]: any = notification.useNotification();
-
+  const hanldeResetDrawerFilter = () => {
+    setOpenFilter(false);
+    setApply(true)
+    setSince('');
+    setUntil('');
+    setCommitsExport([]);
+    setAuthor('')
+   };
+  const handleApplyDrawerFilter = () => {
+    setOpenFilter(false);
+    setApply(true)
+    setCommitsExport([]);
+  };
   useEffect(() => {
-    if (repo1) {
+    if (apply) {
       getListCommits();
       getListBranchs();
-      // getListAuthor();
+      getListAuthor();
     }
-  }, [repo, page, sha])
+  }, [repo, page, sha, since, until, apply, author])
 
+  useEffect(() => { 
+    if(apply)
+    getAll()
+  }, [sha, repo, since, until, apply, author])
+
+
+
+  const getAll = async (pageNext?: number,) => {
+    const page = pageNext || 1
+    let token: any = getCookie('token');
+    if (!token) token = accessToken;
+    setIsLoadingExport(true)
+    const params: any = {
+     /*  since: since,
+      until: until, */
+      sha: sha,
+      page,
+      per_page: 100
+    }
+    if (since) params.since = since;
+    if (until) params.until = until;
+    if (author) params.author = author;
+    const res = await getListCommitRequest(id, repo, token, params);
+    if (res.status === 200) { 
+      const commitsMap = res.data.map((item: any) => {
+        return {
+          ...item,
+          owner: item?.author?.login,
+          title: item?.commit?.message,
+          link: item?.html_url,
+          date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
+        }
+      })
+      // result = [...commitsMap, ...result]
+      setCommitsExport((prevCommits: any) => [...commitsMap, ...prevCommits])
+      // console.log(result);
+      
+    }
+
+    if (res.data.length === 100) getAll(page + 1)
+    else {
+      setTotalRecord(commitsExport.length);
+      setIsLoadingExport(false);
+    }
+
+  }
+
+ // console.log('commitsExport', commitsExport);
+  
 
   const getListCommits = async () => {
     //const { ownerRepo, token } = dataApi;
     let token: any = getCookie('token');
+    setCookie('repo', repo);
     if (!token) token = accessToken;
-    if (!repo) repo = repo1;
-    setIsLoading(true)
-    try {
-      const params = {
-        sha: sha,
-        page,
-        per_page: pageSize
-      }
-      const res = await getListCommitRequest(id, repo, token, params);
-      console.log('res', res);
-      if (res.status === 200) {
-        const commitsMap = res.data.map((item: any) => {
-          return {
-            ...item,
-            owner: item?.author?.login,
-            title: item?.commit?.message,
-            link: item?.html_url,
-            date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
-          }
-        })
-        setTotalRecord(commitsMap.length)
-        setCommits(commitsMap)
-     }
-     setIsLoading(false)
-   } catch (error: any) {
-     console.log('err', error);
-     setIsLoading(false)
-     if (error?.response?.status === 401) {
-      //navigate('/');
-      api['error']({
-        message: 'Error',
-        description:
-          'Error',
-      });
-     } else {
-      api['error']({
-        message: 'Error',
-        description:
-          'Error',
-      });
-     }
+    setIsLoading(true);
+      try {
+        const params: any = {
+          /* since: since,
+          until: until, */
+          sha: sha,
+          page: page,
+          per_page: pageSize
+        }
+        if (since) params.since = since;
+        if (until) params.until = until;
+        if (author) params.author = author;
+        const res = await getListCommitRequest(id, repo, token, params);
+        // if (res.data.length === 100) setPage((prevPage) => prevPage + 1);
+        console.log('res', res);
+        if (res.status === 200) {
+          const commitsMap = res.data.map((item: any) => {
+            return {
+              ...item,
+              owner: item?.author?.login,
+              title: item?.commit?.message,
+              link: item?.html_url,
+              date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
+            }
+          })
+          
+          setCommits(commitsMap)
+        }
+        setIsLoading(false)
+        // eslint-disable-next-line no-const-assign
+      } catch (error: any) {
+        console.log('err', error);
+        setIsLoading(false)
+        if (error?.response?.status === 401) {
+          //navigate('/');
+          api['error']({
+            message: 'Error',
+            description:
+              'Error',
+          });
+        } else {
+          api['error']({
+            message: 'Error',
+            description:
+              'Error',
+          });
+        }
      
-   }
+      }
   }
+  
   const getListBranchs = async () => {
     let token: any = getCookie('token');
     if (!token) token = accessToken;
-    if (!repo) repo = repo1;
     setIsLoading(true)
     try {
       const params = {
@@ -137,7 +235,7 @@ const CommitsList = ({ dataApi }: any) => {
         per_page: pageSize
       }
       const res = await getBranchs(repo, token, params);
-      console.log('res', res);
+     // console.log('res', res);
       if (res.status === 200) {
         const branchMap = res.data.map((item: any) => {
           return {
@@ -146,7 +244,6 @@ const CommitsList = ({ dataApi }: any) => {
           }
         })
         setBranch(branchMap)
-        
      }
      setIsLoading(false)
    } catch (error: any) {
@@ -170,14 +267,15 @@ const CommitsList = ({ dataApi }: any) => {
    }
   }
   const handleChangePageSize = (page: number, pageSize: number) => {
-    setPage(page);
-   // setPageSize(pageSize);
+   setPage(page);
+   setPageSize(pageSize);
   }
-
+  
   const handleExportXlxs = useCallback(() => {
-    const commitsData = commits.map((item: any, index: number) => {
+    const commitsData = commitsExport.map((item: any, index: number) => {
       return {
-          no: index +1,
+          no: index + 1,
+          branch: sha,
           owner: item?.author?.login,
           title: item?.commit?.message,
           link: item?.html_url,
@@ -188,15 +286,13 @@ const CommitsList = ({ dataApi }: any) => {
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "Data");
     writeFileXLSX(wb, `${repo1}_Commits.xlsx`);
-  },[commits])
-  const startIndex = (page - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentPageData = commits.slice(startIndex, endIndex);
-  console.log('All branch:', branch)
+  },[commitsExport])
+
   const getListAuthor = async () => {
-     const { ownerRepo, token } = dataApi;
-     try {
-       const res = await getListCollaborators(ownerRepo, token, {});
+      let token: any = getCookie('token');
+      if (!token) token = accessToken;
+      try {
+       const res = await getListCollaborators(repo , token, {});
       console.log('res', res);
       if (res.status === 200) {
          const authorsMap = res.data.map((item: any) => {
@@ -205,7 +301,8 @@ const CommitsList = ({ dataApi }: any) => {
              value: item.login
            }
          })
-         setAuthor(authorsMap)
+        setAuthors(authorsMap)
+        
       }
     } catch (error: any) {
       console.log('err', error);
@@ -216,7 +313,7 @@ const CommitsList = ({ dataApi }: any) => {
       // });
     }
    }
-
+console.log(authors)
 
 
 
@@ -227,9 +324,40 @@ const CommitsList = ({ dataApi }: any) => {
   // };
   const onChange = async (value: string) => {
     setSha(value);
+    setCommitsExport([]);
+    setApply(true);
+  };
+  const onChangeRepo = async (value: string) => {
+    setRepo(value);
+    setApply(true);
+    setAuthor('');
+  };
+  const onSearchRepo = (value: string) => {
+    setRepo(value);
+    
   };
   const onSearch = (value: string) => {
     setSha(value);
+  };
+  const handleChangeFilterAuthor = (au: string) => {
+    setAuthor(au)
+  };
+  const onChangeDateSince: DatePickerProps['onChange'] = (date, dateString) => {
+   // console.log(date, dateString);
+    setSince(dateString);
+    console.log(since)
+  };
+  const onChangeDateUntil: DatePickerProps['onChange'] = (date, dateString) => {
+    // console.log(date, dateString);
+    setUntil(dateString);
+    console.log(until)
+   };
+  const showDrawerFilter = () => {
+    setOpenFilter(true);
+    setApply(false);
+  };
+  const onCloseDrawerFilter = () => {
+    setOpenFilter(false);
   };
   return (
     <CommitsWrapper>
@@ -239,7 +367,20 @@ const CommitsList = ({ dataApi }: any) => {
             <div style={{ textAlign: 'left', fontSize: '18px', fontWeight: 'bold' }}>
               List Commit: {repo1}</div>
             <TotalRecordTitle style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 'bold' }}>
-              Tổng số Commits: {totalRecord}</TotalRecordTitle>
+              Tổng số Commits: {!isLoadingExport && commitsExport.length}</TotalRecordTitle>
+              <div className="box-search">
+                <div className="search-and-filter">
+                  <Input
+                  prefix={<img src={IconSearch} alt="" />}
+                  className="input-search"
+                  placeholder="Search..."
+                  />
+                  <div className="filter" onClick={showDrawerFilter}>
+                    <img src={IconFilter} alt="" />
+                    <span>Filter</span>
+                  </div>
+                </div>
+              </div>
               <Select
                 className="select"
                 style={{ width: 250 }}
@@ -251,22 +392,86 @@ const CommitsList = ({ dataApi }: any) => {
                 value={sha}
                 onChange={onChange}
                 onSearch={onSearch}
+            ></Select>
+            {accessToken && <div>
+              <Select
+                style={{ width: 250, marginTop: 20 }}
+                size="middle"
+                showSearch
+                placeholder="Select a repository"
+                optionFilterProp="children"
+                options={data}
+                value={repo}
+                onChange={onChangeRepo}
+                onSearch={onSearchRepo}
               ></Select>
+            </div>}
           </div>
-          <Button className="btn-export" onClick={handleExportXlxs}>
-                  Export
-            </Button>
+          {!isLoadingExport && <div>
+                  <Button className="btn-export" onClick={handleExportXlxs}>
+                    Export
+                 </Button>
+                </div>}
         </div>
+        
         <TableContent columns={columns} dataSource={commits} height="55vh" loading={isLoading} />
         <Pagination style={{marginTop: '20px'}}
         defaultCurrent = {page}
-        //pageSize={pageSize}
-        total={5000}
+        pageSize={pageSize}
+        total={commitsExport.length}
         onChange={handleChangePageSize}
-      //  onShowSizeChange={handleChangePageSize}
-      //  showSizeChanger={true}  
-        //pageSizeOptions = {[30,50,100]}
-      />
+        onShowSizeChange={handleChangePageSize}
+        showSizeChanger={true}  
+        pageSizeOptions = {[30,50,100]}
+        />
+        <DrawerWrapper
+        placement="right"
+        open={openFilter}
+        closable={false}
+        width={480}
+        onClose={onCloseDrawerFilter}>
+        <div>
+          <div className="title-filter">
+            <span>Advanced Filter</span>
+            <img src={IconCloseFilter} alt="" onClick={onCloseDrawerFilter} />
+          </div>
+          <div className="style">Author</div>
+          <Select
+            value={author}
+            style={{ width: '100%' }}
+            onChange={handleChangeFilterAuthor}
+            options={authors}
+            suffixIcon={<img src={IconSelectFilter} alt="" />}
+            allowClear
+            />
+            <div className="style">Date</div>
+            <h4>From</h4>
+            <DatePicker
+              style={{ marginTop: 10, marginBottom: 10 }}
+              onChange={onChangeDateSince}
+              /* format="DD-MM-YYYY" */
+            />  
+            <h4>To</h4>
+            <DatePicker 
+              style={{marginTop: 10, marginBottom: 10}} 
+              onChange={onChangeDateUntil}
+             /*  format="DD-MM-YYYY" */
+            />
+        </div>
+        <div className="footer">
+          <span className="reset" onClick={hanldeResetDrawerFilter}>
+            Reset
+          </span>
+          <div>
+            <Button className="btn-cancel" onClick={onCloseDrawerFilter}>
+              Cancel
+            </Button>
+            <Button className="btn-apply" onClick={handleApplyDrawerFilter}>
+              Apply
+            </Button>
+          </div>
+        </div>
+      </DrawerWrapper>
       </div>
       {contextHolder}
     </CommitsWrapper>

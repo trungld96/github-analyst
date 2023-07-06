@@ -1,8 +1,9 @@
-import { Button, Input, Pagination, Select, Typography, notification } from 'antd';
+import { Button, DatePicker, Input, Pagination, Select, Typography, notification } from 'antd';
 import { useEffect, useState, useCallback } from 'react';
 import { extractOwnerRepo, getCookie, setCookie } from '../../utils/shared';
 import { checkRepoExits, getListCollaborators, getListPullRequest } from '../../services/services';
 import TableContent from '../TableContent';
+import type { DatePickerProps } from 'antd';
 import IconFilter from '../../assets/images/icon-filter.svg';
 import IconCloseFilter from '../../assets/images/icon-close-filter.svg';
 import IconSelectFilter from '../../assets/images/icon-select-filter.svg';
@@ -70,13 +71,21 @@ const PullsList = ({ dataApi, data }: any) => {
   
   const [author, setAuthor] = useState<string>();
 
+  const [prsExport, setPrsExport] = useState<any>([]);
+
   const [page, setPage] = useState<number>(1);
 
   const [pageSize, setPageSize] = useState<number>(100);
 
   const [authors, setAuthors] = useState([]);
 
+  const [since, setSince] = useState('');
+
+  const [until, setUntil] = useState('');
+
   const [pulls, setPulls] = useState([]);
+
+  const [apply, setApply] = useState(true);
   
   const [totalRecord, setTotalRecord] = useState(0);
 
@@ -90,11 +99,45 @@ const PullsList = ({ dataApi, data }: any) => {
   const [api, contextHolder]: any = notification.useNotification();
 
   useEffect(() => {
-    if(repo) getListPulls(page, pageSize);
-    getListAuthor();
-  }, [page, pageSize, repo])
-
-
+    if (repo && apply) {
+      getListPulls(page, pageSize);
+      getListAuthor();
+    }
+  }, [page, pageSize, repo, apply]) 
+  
+  useEffect(() => {
+    if(apply)
+    getAll()
+  }, [apply])
+  
+  const getAll = async (pageNext?: number) => {
+    const page = pageNext || 1
+    let token: any = getCookie('token');
+    if (!token) token = accessToken;
+    const params: any = {
+        author,
+        page,
+        per_page: 100,
+    }
+    if (since) params.since = since;
+    if (until) params.until = until;
+    if (author) params.author = author;
+    const res = await getListPullRequest(repo, token, params);
+    if (res.status === 200) { 
+      const pullsMap = res.data.items.map((item: any) => {
+        return {
+          ...item,
+          owner: item.user.login,
+          link: item?.pull_request?.html_url,
+          date: dayjs(item?.created_at).format('DD/MM/YYYY'),
+        }
+      })
+      setPrsExport((prevPulls: any) => [...pullsMap, ...prevPulls])
+      }
+    if (res.data.items.length === 100) getAll(page + 1);
+  }
+  
+  console.log('pullExport', prsExport);
   const getListPulls = async (page: number, pageSize: number) => {
     let token: any = getCookie('token');
     setCookie('repo', repo);
@@ -102,11 +145,14 @@ const PullsList = ({ dataApi, data }: any) => {
     console.log('token', token);
     setIsLoading(true)
     try {
-      const params = {
+      const params: any = {
         author,
         page,
         per_page: pageSize
       }
+      if (since) params.since = since;
+     if (until) params.until = until;
+     if (author) params.author = author;
       const res = await getListPullRequest(repo, token, params);
       console.log('res', res);
       if (res.status === 200) {
@@ -184,6 +230,7 @@ const PullsList = ({ dataApi, data }: any) => {
 
   const showDrawerFilter = () => {
     setOpenFilter(true);
+    setApply(false);
   };
 
   const onCloseDrawerFilter = () => {
@@ -197,12 +244,11 @@ const PullsList = ({ dataApi, data }: any) => {
 
   const handleApplyDrawerFilter = () => {
     setOpenFilter(false);
-
-    console.log('author', author);
-    
+    setApply(true);
+    setPrsExport([]);
   };
   const handleExportXlxs = useCallback(() => {
-    const pullData = pulls.map((item: any, index: number) => {
+    const pullData = prsExport.map((item: any, index: number) => {
       return {
           no: index +1,
           owner: item.user.login,
@@ -217,16 +263,34 @@ const PullsList = ({ dataApi, data }: any) => {
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "Data");
     writeFileXLSX(wb, `${repo}_PullRequests.xlsx`);
-  },[pulls])
-  const hanldeResetDrawerFilter = () => {};
+  },[prsExport])
+  const hanldeResetDrawerFilter = () => {
+    setOpenFilter(false);
+    setApply(true)
+    setSince('');
+    setUntil('');
+    setPrsExport([]);
+    setAuthor('')
+  };
   const onChange = async (value: string) => {
     setRepo(value);
+    setApply(true);
+    setPrsExport([]);
   };
   const onSearch = (value: string) => {
     setRepo(value);
   };
   console.log('repo', repo);
-
+  const onChangeDateSince: DatePickerProps['onChange'] = (date, dateString) => {
+    // console.log(date, dateString);
+     setSince(dateString);
+     console.log(since)
+   };
+   const onChangeDateUntil: DatePickerProps['onChange'] = (date, dateString) => {
+     // console.log(date, dateString);
+     setUntil(dateString);
+     console.log(until)
+    };
 const clickRow = (record: any, rowIndex: number) => {
   console.log(record, rowIndex);
   (!accessToken) ? navigate(`/pulls/${record.number}?repo=${repo}`) : 
@@ -300,6 +364,19 @@ const clickRow = (record: any, rowIndex: number) => {
             suffixIcon={<img src={IconSelectFilter} alt="" />}
             allowClear
           />
+          <div className="style">Date</div>
+            <h4>From</h4>
+            <DatePicker
+              style={{ marginTop: 10, marginBottom: 10 }}
+              onChange={onChangeDateSince}
+              /* format="DD-MM-YYYY" */
+            />  
+            <h4>To</h4>
+            <DatePicker 
+              style={{marginTop: 10, marginBottom: 10}} 
+              onChange={onChangeDateUntil}
+             /*  format="DD-MM-YYYY" */
+            />
         </div>
         <div className="footer">
           <span className="reset" onClick={hanldeResetDrawerFilter}>
