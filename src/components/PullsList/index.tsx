@@ -140,6 +140,7 @@ const PullsList = ({ dataApi, data }: any) => {
     if (res.data.items.length === 100) getAll(page + 1)
     else {
       setIsLoadingExport(false);
+      setIsLoading(false);
     }
   }
   
@@ -156,7 +157,7 @@ const PullsList = ({ dataApi, data }: any) => {
         page,
         per_page: pageSize
       }
-      if (since) params.since = since;
+     if (since) params.since = since;
      if (until) params.until = until;
      if (author) params.author = author;
       const res = await getListPullRequest(repo, token, params);
@@ -172,8 +173,8 @@ const PullsList = ({ dataApi, data }: any) => {
         })
         setTotalRecord(res.data.total_count)
         setPulls(pullsMap)
-     }
-     setIsLoading(false)
+      }
+      setIsLoading(false);
    } catch (error: any) {
      console.log('err', error);
      setIsLoading(false)

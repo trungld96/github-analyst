@@ -147,7 +147,7 @@ const CommitsList = ({ dataApi, data }: any) => {
       const commitsMap = res.data.map((item: any) => {
         return {
           ...item,
-          owner: item?.author?.login,
+          owner: item?.author?.login || item?.commit?.author.name,
           title: item?.commit?.message,
           link: item?.html_url,
           date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
@@ -195,7 +195,7 @@ const CommitsList = ({ dataApi, data }: any) => {
           const commitsMap = res.data.map((item: any) => {
             return {
               ...item,
-              owner: item?.author?.login,
+              owner: item?.author?.login || item?.commit?.author.name,
               title: item?.commit?.message,
               link: item?.html_url,
               date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
@@ -203,8 +203,9 @@ const CommitsList = ({ dataApi, data }: any) => {
           })
           
           setCommits(commitsMap)
+          console.log(commitsMap);
         }
-        setIsLoading(false)
+       setIsLoading(false)
         // eslint-disable-next-line no-const-assign
       } catch (error: any) {
         console.log('err', error);
@@ -278,7 +279,7 @@ const CommitsList = ({ dataApi, data }: any) => {
       return {
           no: index + 1,
           branch: sha,
-          owner: item?.author?.login,
+          owner: item?.author?.login || item?.commit?.author.name,
           title: item?.commit?.message,
           link: item?.html_url,
           date: dayjs(item?.commit?.committer.date).format('DD/MM/YYYY'),
