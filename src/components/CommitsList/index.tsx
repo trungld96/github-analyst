@@ -117,12 +117,12 @@ const CommitsList = ({ dataApi, data }: any) => {
       getListBranchs();
       getListAuthor();
     }
-  }, [repo, page, sha, since, until, apply, author])
+  }, [repo, page, sha, apply])
 
   useEffect(() => { 
     if(apply)
     getAll()
-  }, [sha, repo, since, until, apply, author])
+  }, [sha, repo, apply])
 
 
 
@@ -130,7 +130,8 @@ const CommitsList = ({ dataApi, data }: any) => {
     const page = pageNext || 1
     let token: any = getCookie('token');
     if (!token) token = accessToken;
-    setIsLoadingExport(true)
+    setIsLoadingExport(true);
+    setIsLoading(true)
     const params: any = {
      /*  since: since,
       until: until, */
@@ -153,7 +154,7 @@ const CommitsList = ({ dataApi, data }: any) => {
         }
       })
       // result = [...commitsMap, ...result]
-      setCommitsExport((prevCommits: any) => [...commitsMap, ...prevCommits])
+      setCommitsExport((prevCommits: any) => [...prevCommits,...commitsMap,])
       // console.log(result);
       
     }
@@ -162,6 +163,7 @@ const CommitsList = ({ dataApi, data }: any) => {
     else {
       setTotalRecord(commitsExport.length);
       setIsLoadingExport(false);
+      setIsLoading(false)
     }
 
   }
