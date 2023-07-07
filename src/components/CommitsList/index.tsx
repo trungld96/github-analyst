@@ -413,11 +413,9 @@ console.log(authors)
               ></Select>
             </div>}
           </div>
-          {!isLoadingExport && <div>
-                  <Button className="btn-export" onClick={handleExportXlxs}>
+                  <Button className="btn-export" onClick={handleExportXlxs} loading={isLoadingExport}>
                     Export
                  </Button>
-                </div>}
         </div>
         
         <TableContent columns={columns} dataSource={commits} height="55vh" loading={isLoading} />

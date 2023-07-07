@@ -135,7 +135,7 @@ const PullsList = ({ dataApi, data }: any) => {
           date: dayjs(item?.created_at).format('DD/MM/YYYY'),
         }
       })
-      setPrsExport((prevPulls: any) => [...pullsMap, ...prevPulls])
+      setPrsExport((prevPulls: any) => [ ...prevPulls, ...pullsMap,])
       }
     if (res.data.items.length === 100) getAll(page + 1)
     else {
@@ -332,11 +332,11 @@ const clickRow = (record: any, rowIndex: number) => {
               ></Select>
             </div>}
           </div>
-          {!isLoadingExport && <div>
-            <Button className="btn-export" onClick={handleExportXlxs}>
+          <div>
+            <Button className="btn-export" onClick={handleExportXlxs} loading={isLoadingExport}>
               Export
             </Button>
-          </div>}
+          </div>
         </div>
         {/* <TotalRecordTitle style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 'bold'}}>Tổng số Pulls Request: {totalRecord}</TotalRecordTitle> */}
         <TableContent columns={columns} dataSource={pulls} height="55vh" loading={isLoading} clickRowTable={clickRow}/>
